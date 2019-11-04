@@ -44,12 +44,6 @@ for tweet in t.search(Q_3):
     cnt += 1
 print ("Q_3=", cnt)
 
-"""
-Data Collection = Oct. 30
-Joe Biden = 788900
-Elizabeth Warren = 276580
-Bernie Sanders = 416917
-"""
 
 data = []
 in_file_1 = open(OUTPUT_JSON_FILE_1, "r", encoding = 'utf-8')
@@ -140,6 +134,22 @@ for text in df2.Texts:
     texts.append(word)
 
 df2['Clean'] = texts
+
+d = {
+'🚨': '',
+'🔥': '',
+'🤝': '',
+'🇺🇸': ''
+}
+
+replace = []
+for item in df2.Clean:
+    for key in d.keys():
+        rep = item.replace(key, d[key])
+        
+    replace.append(item)
+    
+df2.Clean = replace
 
 temp = []
 for item in df2.Clean:
