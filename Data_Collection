@@ -2,6 +2,11 @@ from twarc import Twarc
 import json
 import csv
 import pandas as pd
+import re
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+lemmatizer = WordNetLemmatizer()
 
 consumer_key = ""
 consumer_secret = ""
@@ -126,5 +131,36 @@ with open(file="candidates_data.csv", mode = "w", newline = "", encoding="utf-8"
                          "User_Screen_Name" : user_screen_name, "User_Location" : user_location})
                          
 df = pd.read_csv ("candidates_data.csv", ",", encoding = 'utf-8')
+
+df2 = df[['Texts']]
+
+texts = []
+for text in df2.Texts:
+    word = re.sub(r'http\w?[:./A-Za-z0-9]*', " ", text)        
+    texts.append(word)
+
+df2['Clean'] = texts
+
+temp = []
+for item in df2.Clean:
+    tokens = nltk.word_tokenize(item.lower())
+    lemmatized = [lemmatizer.lemmatize(w, 'v') for w in tokens]
+    tags = nltk.pos_tag (lemmatized)
+    temp.append(tags)
+df2["tags"] = temp
+
+stopwords = stopwords.words("english")
+
+key = []
+for items in df2.tags:
+    temp = []
+    for item in items:
+        if (item[1].isupper() == False) or (item[1].startswith('C')) or (item[0] in stopwords):
+            continue
+        else:
+            temp.append(item[0])
+    key.append(temp)
+df2['Keywords'] = key
+
 
 
