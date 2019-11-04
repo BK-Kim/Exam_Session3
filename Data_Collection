@@ -1,0 +1,130 @@
+from twarc import Twarc
+import json
+import csv
+import pandas as pd
+
+consumer_key = ""
+consumer_secret = ""
+access_token = ""
+access_token_secret = ""
+
+Q_1 = "Joe Biden"
+OUTPUT_JSON_FILE_1 = "Joe_Biden_tweets.json"
+Q_2 = "Elizabeth Warren"
+OUTPUT_JSON_FILE_2 = "Elizabeth_Warren_tweets.json"
+Q_3 = "Bernie Sanders"
+OUTPUT_JSON_FILE_3 = "Bernie_Sanders_tweets.json"
+
+t = Twarc(consumer_key, consumer_secret, access_token, access_token_secret)
+
+outfile_1 = open(OUTPUT_JSON_FILE_1, "w", encoding = "utf-8")
+outfile_2 = open(OUTPUT_JSON_FILE_2, "w", encoding = "utf-8")
+outfile_3 = open(OUTPUT_JSON_FILE_3, "w", encoding = "utf-8")
+
+cnt = 0
+for tweet in t.search(Q_1):
+    outfile_1.write(json.dumps(tweet).encode("utf-8").decode() + "\n") 
+    cnt += 1
+print ("Q_1=", cnt)
+
+cnt = 0
+for tweet in t.search(Q_2):
+    outfile_2.write(json.dumps(tweet).encode("utf-8").decode() + "\n")
+    cnt += 1
+print ("Q_2=", cnt)
+
+cnt = 0
+for tweet in t.search(Q_3):
+    outfile_3.write(json.dumps(tweet).encode("utf-8").decode() + "\n")
+    cnt += 1
+print ("Q_3=", cnt)
+
+"""
+Data Collection = Oct. 30
+Joe Biden = 788900
+Elizabeth Warren = 276580
+Bernie Sanders = 416917
+"""
+
+data = []
+in_file_1 = open(OUTPUT_JSON_FILE_1, "r", encoding = 'utf-8')
+in_file_2 = open (OUTPUT_JSON_FILE_2, "r", encoding = 'utf-8')
+in_file_3 = open (OUTPUT_JSON_FILE_3, "r", encoding = 'utf-8')
+
+cnt = 0
+data_ids = []
+
+for line in in_file_1:
+    if cnt < 100000:
+        item  = json.loads(line)
+        if item['id'] not in data_ids:
+            data_ids.append(item['id'])
+            data.append(item)
+            cnt += 1
+        else:
+            continue
+    else:
+        break
+
+cnt = 0        
+for line2 in in_file_2:
+    if cnt < 100000:
+        item  = json.loads(line2)
+        if item['id'] not in data_ids:
+            data_ids.append(item['id'])
+            data.append(item)
+            cnt += 1
+        else:
+            continue
+    else:
+        break
+
+cnt = 0        
+for line3 in in_file_3:
+    if cnt < 100000:
+        item  = json.loads(line3)
+        if item['id'] not in data_ids:
+            data_ids.append(item['id'])
+            data.append(item)
+            cnt += 1
+        else:
+            continue
+    else:
+        break
+
+    
+print(data[0])
+print (len(data))
+
+with open(file="candidates_data.csv", mode = "w", newline = "", encoding="utf-8") as csvfile:
+    fieldnames = ["Tweet_Id", "Time_Stamp", "Texts", "is_retweet", "retweeted_by", "User_Id", "User_Name", 
+                  "User_Screen_Name", "User_Location"]
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writeheader()
+
+    for item in data:
+        tweet_id = item['id']
+        time_stamp = item['created_at']
+        texts = item ['full_text']
+
+        if item['retweeted'] == True:
+            is_retweet = "1"
+            
+        else:
+            is_retweet = "0"
+            
+        retweeted_by = item['retweet_count']
+        
+        user_id = item['user']['id']
+        user_name = item['user']['name']
+        user_screen_name = item['user']['screen_name']
+        user_location = item['user']['location']
+        
+            
+        writer.writerow({"Tweet_Id" : tweet_id, "Time_Stamp" : time_stamp, "Texts" : texts, "is_retweet" : is_retweet, 
+                         "retweeted_by" : retweeted_by, "User_Id" : user_id, "User_Name" : user_name, 
+                         "User_Screen_Name" : user_screen_name, "User_Location" : user_location})
+                         
+df = pd.read_csv ("candidates_data.csv", ",", encoding = 'utf-8')
+
+
