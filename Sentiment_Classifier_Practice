@@ -40,3 +40,6 @@ train_portion = round(len(politics_sentiment) * 0.7)
 train = politics_sentiment [:train_portion]
 test = politics_sentiment [train_portion:]
 
+classifier_test = NaiveBayesClassifier(train)
+classifier_test.accuracy(test)
+
