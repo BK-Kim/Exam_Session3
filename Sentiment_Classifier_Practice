@@ -33,3 +33,10 @@ for i in s:
         data = (sent, tb.sentiment[0])
         politics_sentiment.append(data)
         
+random.shuffle(politics_sentiment)
+
+train_portion = round(len(politics_sentiment) * 0.7)
+
+train = politics_sentiment [:train_portion]
+test = politics_sentiment [train_portion:]
+
