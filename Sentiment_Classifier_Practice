@@ -1,0 +1,35 @@
+# The following code is a practice to create a sentiment classifier, specifically relevant to a political context. 
+# A training data set is created based on the 20 Newsgroups data sets (categories relevant to politics)
+
+from textblob import TextBlob
+from textblob.classifiers import *
+from textblob.sentiments import NaiveBayesAnalyzer
+import nltk
+import re
+from sklearn.datasets import fetch_20newsgroups
+
+politics = ['talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc']
+newsgroups_train = fetch_20newsgroups(subset='train', categories=politics)
+
+s = newsgroups_train['data']
+
+politics_sentiment = [] # This list is a training data set
+
+# regular expression for selecting the main body of each news article.
+# Each sentence was tokenized from each news article to construct individual items for training data set
+# Using Naive Bayese Analyzer, 'pos' or 'neg' label for each sentence was analyzed. 
+# A tuple is created (e.g., (sentence, label of sentiment). 
+
+for i in s:
+    news_clean = re.sub(r'\n', ' ', i)
+    news_start = re.findall(r'(?:Lines: \d+)\w.*', news_clean)
+    news_start2 = re.sub(r'Lines: \d+', '', news_start[0])
+    sent_tokens = nltk.sent_tokenize(news_start2)
+        
+    for j in range(len(sent_tokens)):
+        sent = sent_tokens[j]
+        tb = TextBlob(sent, analyzer = NaiveBayesAnalyzer())
+        
+        data = (sent, tb.sentiment[0])
+        politics_sentiment.append(data)
+        
