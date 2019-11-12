@@ -22,9 +22,8 @@ politics_sentiment = [] # This list is a training data set
 
 for i in s:
     news_clean = re.sub(r'\n', ' ', i)
-    news_start = re.findall(r'(?:Lines: \d+)\w.*', news_clean)
-    news_start2 = re.sub(r'Lines: \d+', '', news_start[0])
-    sent_tokens = nltk.sent_tokenize(news_start2)
+    news_clean = re.sub(r'\t', ' ', news_clean)
+    sent_tokens = nltk.sent_tokenize(news_clean)
         
     for j in range(len(sent_tokens)):
         sent = sent_tokens[j]
